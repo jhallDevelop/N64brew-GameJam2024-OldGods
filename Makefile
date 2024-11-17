@@ -3,15 +3,28 @@ ROMTITLE = "N64BREW GAMEJAM 2024"
 
 BUILD_DIR = build
 ASSETS_DIR = assets
-MINIGAME_DIR = code
 FILESYSTEM_DIR = filesystem
+MINIGAME_DIR = code
+AF_LIB_DIR = $(N64_INST)/AF_Lib/include
+AF_MATH_DIR = $(N64_INST)/AF_Math/include
+LIBDRAGON_DIR = $(N64_INST)/libdragon/include
+UNFLOADER_DIR = $(N64_INST)/UNFLoader
+T3D_DIR = $(N64_INST)/t3d
+
+CFLAGS += -I$(LIBDRAGON_DIR)
+CFLAGS += -I$(AF_LIB_DIR)
+CFLAGS += -I$(AF_MATH_DIR)
+CFLAGS += -I$(UNFLOADER_DIR)
+CFLAGS += -I$(T3D_DIR)
+
 #-- ADDED
 MINIGAMEDSO_DIR = $(FILESYSTEM_DIR)/minigames
 
 # UNFLoader files
-UNFLLOADER_DIR = UNFLoader/
-DEBUGFILES = $(UNFLLOADER_DIR)debug.c $(UNFLLOADER_DIR)usb.c
-CFLAGS += -IAF_Math/include -IAF_Lib/include -IUNFLoader
+
+DEBUGFILES = $(UNFLOADER_DIR)/debug.c $(UNFLOADER_DIR)/usb.c
+
+
 
 SRC = main.c core.c minigame.c menu.c $(DEBUGFILES:.c=.o)
 
@@ -20,7 +33,8 @@ filesystem/squarewave.font64: MKFONT_FLAGS += --outline 1 --range all
 ###
 
 include $(N64_INST)/include/n64.mk
-include $(N64_INST)/include/t3d.mk
+include $(T3D_DIR)/t3d.mk
+
 
 MINIGAMES_LIST = $(notdir $(wildcard $(MINIGAME_DIR)/*))
 DSO_LIST = $(addprefix $(MINIGAMEDSO_DIR)/, $(addsuffix .dso, $(MINIGAMES_LIST)))
@@ -72,6 +86,7 @@ $(FILESYSTEM_DIR)/%.xm64: $(ASSETS_DIR)/%.xm
 	@echo "    [XM] $@"
 	$(N64_AUDIOCONV) $(AUDIOCONV_FLAGS) -o $(dir $@) "$<"
 
+
 define MINIGAME_template
 SRC_$(1) = \
 	$$(wildcard $$(MINIGAME_DIR)/$(1)/*.c) \
@@ -81,7 +96,7 @@ SRC_$(1) = \
 $$(MINIGAMEDSO_DIR)/$(1).dso: $$(SRC_$(1):%.cpp=$$(BUILD_DIR)/%.o)
 $$(MINIGAMEDSO_DIR)/$(1).dso: $$(SRC_$(1):%.c=$$(BUILD_DIR)/%.o)
 
--include $$(MINIGAME_DIR)/$(1)/$(1).mk ]
+-include $$(MINIGAME_DIR)/$(1)/$(1).mk
 
 
 endef
@@ -98,8 +113,9 @@ $(ROMNAME).z64: $(BUILD_DIR)/$(ROMNAME).dfs $(BUILD_DIR)/$(ROMNAME).msym
 $(BUILD_DIR)/$(ROMNAME).msym: $(BUILD_DIR)/$(ROMNAME).elf
 
 clean:
-	rm -rf $(BUILD_DIR) $(FILESYSTEM_DIR) $(DSO_LIST) $(ROMNAME).z64 
+	rm -rf $(BUILD_DIR) $(FILESYSTEM_DIR) $(DSO_LIST) $(ROMNAME).z64
 
 -include $(wildcard $(BUILD_DIR)/*.d)
+
 
 .PHONY: all clean
