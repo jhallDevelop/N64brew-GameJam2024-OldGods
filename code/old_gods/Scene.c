@@ -134,11 +134,11 @@ void PlayerController_DamageHandler(AppData* _appData){
             for(int x = 0; x < PLAYER_COUNT; ++x){
                 
                 if (i != x){
-                    // skip the player chekcing against itself
+                    // skip the player checking against itself
                     AF_Entity* otherPlayerEntity = _appData->gameplayData.playerEntities[x];
                     Vec3* otherPlayerPos = &otherPlayerEntity->transform->pos;
                     float playersInRange = Vec3_DISTANCE(*playerPos, *otherPlayerPos);
-                    debugf("Player is attatcking %f \n" , playersInRange);
+                    debugf("Player is attacking %f \n" , playersInRange);
                     if(playersInRange < ATTACK_RADIUS){
                         // Other player is in range
                         // attack
@@ -173,7 +173,7 @@ void Scene_Update(AppData* _appData){
     if(_appData->gameplayData.gameState == GAME_STATE_PLAYING){
         
         PlayerController_UpdateAllPlayerMovements(&_appData->input, *_appData->gameplayData.playerEntities, PLAYER_COUNT);
-        // Check if any players are "attatcking" if yes, then deal damage.
+        // Check if any players are "attacking" if yes, then deal damage.
         PlayerController_DamageHandler(_appData);
 
     }
@@ -443,7 +443,7 @@ void Scene_OnTrigger(AF_Collision* _collision){
 
 /*
 Scene_OnGodTrigger
-Callback Behaviour triggered when the player dropps off a sacrafice to the gods
+Callback Behaviour triggered when the player drops off a sacrifice to the gods
 */
 void Scene_OnGodTrigger(AF_Collision* _collision){
 	AF_Entity* entity2 =  _collision->entity2;
@@ -498,7 +498,7 @@ void Scene_BucketCollisionBehaviour(int _currentBucket, int _bucketID, AF_Collis
     // Second collision is the playable character
     AF_CPlayerData* playerData2 = entity2->playerData;
    
-        // attatch the villager to this player
+        // attach the villager to this player
         if(_villager->playerData->isCarried == FALSE){
             playerData2->carryingEntity = _villager->id_tag;
             _villager->mesh->material.textureID = _godEntity->mesh->material.textureID;

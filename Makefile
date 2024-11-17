@@ -1,41 +1,37 @@
 ROMNAME = gamejam2024
 ROMTITLE = "N64BREW GAMEJAM 2024"
 
+# Directories
 BUILD_DIR = build
 ASSETS_DIR = assets
 FILESYSTEM_DIR = filesystem
 MINIGAME_DIR = code
+MINIGAMEDSO_DIR = $(FILESYSTEM_DIR)/minigames
 AF_LIB_DIR = $(N64_INST)/AF_Lib/include
 AF_MATH_DIR = $(N64_INST)/AF_Math/include
 LIBDRAGON_DIR = $(N64_INST)/libdragon/include
 UNFLOADER_DIR = $(N64_INST)/UNFLoader
 T3D_DIR = $(N64_INST)/t3d
 
+# External Libraries
 CFLAGS += -I$(LIBDRAGON_DIR)
 CFLAGS += -I$(AF_LIB_DIR)
 CFLAGS += -I$(AF_MATH_DIR)
 CFLAGS += -I$(UNFLOADER_DIR)
 CFLAGS += -I$(T3D_DIR)
 
-#-- ADDED
-MINIGAMEDSO_DIR = $(FILESYSTEM_DIR)/minigames
-
-# UNFLoader files
-
+# Debug Files
 DEBUGFILES = $(UNFLOADER_DIR)/debug.c $(UNFLOADER_DIR)/usb.c
-
-
-
 SRC = main.c core.c minigame.c menu.c $(DEBUGFILES:.c=.o)
 
-filesystem/squarewave.font64: MKFONT_FLAGS += --outline 1 --range all
+# Font Files
+$(FILESYSTEM_DIR)/squarewave.font64: MKFONT_FLAGS += --outline 1 --range all
 
-###
-
+# Include files
 include $(N64_INST)/include/n64.mk
 include $(T3D_DIR)/t3d.mk
 
-
+# Minigame files
 MINIGAMES_LIST = $(notdir $(wildcard $(MINIGAME_DIR)/*))
 DSO_LIST = $(addprefix $(MINIGAMEDSO_DIR)/, $(addsuffix .dso, $(MINIGAMES_LIST)))
 
