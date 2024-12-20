@@ -626,31 +626,17 @@ void UI_Menu_RenderMainMenu(AppData* _appData){
     // TODO: tidy this up
     if(isMusicPlaying == FALSE){
         // TODO: make this read from assets
-        
+        wav64_open(&music_2, "rom:/old_gods/sandy_seaside.wav64");
         // set sound to loop
         wav64_set_loop(&music_2, true);
-        // TODO: fix memory leak with playing this music file.
-        // For some reason stopping the channel, then closing this wav doesn't release all the memory.
-        // other audio files seem to release fine.
-        
-        if(ENABLE_SOUND == TRUE){
-            // stop the music if its already playing
-            mixer_ch_stop(UI_MUSIC_CH);
-            // play the music
-            wav64_play(&music_2, UI_MUSIC_CH);
-            isMusicPlaying = TRUE;
-        }
+        wav64_play(&music_2, 0);
+        isMusicPlaying = TRUE;
     }
     
 
     // detect start button pressed
     if(_appData->input.keys[A_KEY]->pressed == TRUE){
-        if(ENABLE_SOUND == TRUE){
-            // stop the music if its already playing
-            mixer_ch_stop(UI_FX_CH);
-            // play the music
-            wav64_play(&sfx_startButton, UI_FX_CH);
-        }
+        wav64_play(&sfx_startButton, 31);
         GameplayData* gameplayData = &_appData->gameplayData;
         // gods count reset
         gameplayData->godEatCount = 0;
@@ -784,11 +770,9 @@ void UI_Menu_RenderGameOverScreen(AppData* _appData ){
     for(int i = 0; i < PLAYER_COUNT; ++i){
         // detect start button pressed to restart the game
         if(_appData->input.keys[i][A_KEY].pressed == TRUE){
-            //gameplayData->gameState = GAME_STATE_GAME_RESTART;
-            //debugf("End minigame\n");
             gameplayData->gameState = GAME_STATE_GAME_END;
             core_set_winner(playerWithHighestScore);
-            //minigame_end(); 
+            minigame_end(); 
         }
 
         // Let the game jam template handle the game ending
@@ -796,7 +780,7 @@ void UI_Menu_RenderGameOverScreen(AppData* _appData ){
             //debugf("End minigame\n");
             gameplayData->gameState = GAME_STATE_GAME_END;
             core_set_winner(playerWithHighestScore);
-            //minigame_end(); 
+            minigame_end(); 
         }
     }
 }
@@ -818,11 +802,7 @@ void UI_Menu_RenderCountdown(AppData* _appData){
         float prevCountDown = countDownTimer;
         countDownTimer -= _appData->gameTime.timeSinceLastFrame;
         if ((int)prevCountDown != (int)countDownTimer && countDownTimer >= 0){
-           if(ENABLE_SOUND == TRUE){
-            // stop the music if its already playing
-                mixer_ch_stop(UI_FX_COUNTDOWN_CH);
-                wav64_play(&sfx_countdown, UI_FX_COUNTDOWN_CH);
-           }
+            wav64_play(&sfx_countdown, 31);
             // update the char buffer that will be the onscreen text. ensure there
             sprintf(startCountdownCharBuffer, "%i", ((int)countDownTimer)+1);
             startCountdownLabelEntity->text->text = startCountdownCharBuffer;
@@ -831,15 +811,9 @@ void UI_Menu_RenderCountdown(AppData* _appData){
         return;
     }
     // this will only play once
-    if(ENABLE_SOUND == TRUE){
-        // stop the music if its already playing
-        //mixer_ch_stop(UI_MUSIC_CH);
-        // incase some other FX is already playing
-        mixer_ch_stop(UI_FX_CH);
-        // play the start sound
-        wav64_play(&sfx_start, UI_FX_CH);
-        isStartedPlaying = TRUE;
-    }
+    wav64_play(&sfx_start, 31);
+    isStartedPlaying = TRUE;
+   
     
     startCountdownLabelEntity->text->isDirty = TRUE;
     // TODO: add a final slight delay to allow the words GO!!! to be read
@@ -858,27 +832,18 @@ void UI_Menu_RenderPausedScreen(AppData* _appData){
     UI_Menu_CountdownState(FALSE);
 
         // detect start button pressed by any player
+        
         for(int i = 0; i < PLAYER_COUNT; ++i){
             if(_appData->input.keys[i][A_KEY].pressed == TRUE){
-                    //debugf("Resume game\n");
-                    if(ENABLE_SOUND == TRUE){
-                        // stop the music if its already playing
-                        mixer_ch_stop(UI_FX_CH);
-                        // play the music
-                        wav64_play(&sfx_startButton, UI_FX_CH);
-                    }
+                    debugf("Resume game\n");
+                    wav64_play(&sfx_startButton, 31);
                     GameplayData* gameplayData = &_appData->gameplayData;
                     gameplayData->gameState = GAME_STATE_PLAYING;
             }
 
             if(_appData->input.keys[i][B_KEY].pressed == TRUE){
-                    //debugf("Exit game\n");
-                    if(ENABLE_SOUND == TRUE){
-                        // stop the music if its already playing
-                        mixer_ch_stop(UI_FX_CH);
-                        // play the music
-                        wav64_play(&sfx_startButton, UI_FX_CH);
-                    }
+                    debugf("Exit game\n");
+                    wav64_play(&sfx_startButton, 31);
                     GameplayData* gameplayData = &_appData->gameplayData;
                     gameplayData->gameState = GAME_STATE_GAME_END;
             }
